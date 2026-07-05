@@ -136,6 +136,20 @@ app.kubernetes.io/component: dependency-track
 {{- end }}
 
 {{/*
+Per-service database secret key lookups, defaulting to the CloudNativePG
+application-secret key names when secretKeys (or an individual key) is unset.
+*/}}
+{{- define "artifact-keeper.backend.dbSecretKey" -}}
+{{- $keys := .root.Values.backend.database.secretKeys | default dict -}}
+{{- get $keys .key | default .default -}}
+{{- end }}
+
+{{- define "artifact-keeper.dtrack.dbSecretKey" -}}
+{{- $keys := .root.Values.dependencyTrack.database.secretKeys | default dict -}}
+{{- get $keys .key | default .default -}}
+{{- end }}
+
+{{/*
 Database URL helper — returns the full DATABASE_URL string
 */}}
 {{- define "artifact-keeper.databaseUrl" -}}
@@ -162,6 +176,11 @@ ServiceAccount name
 {{- if eq .Values.secrets.jwtSecret "" -}}
 {{- fail "secrets.jwtSecret is required when externalSecrets is not enabled. Set it with --set secrets.jwtSecret=<value>" -}}
 {{- end -}}
+{{- if lt (len .Values.secrets.jwtSecret) 32 -}}
+{{- fail "secrets.jwtSecret must be at least 32 characters; the backend refuses shorter secrets at startup. Generate one with e.g. `openssl rand -base64 48`" -}}
+{{- end -}}
+{{- end -}}
+{{- if not .Values.externalSecrets.enabled -}}
 {{- if and .Values.postgres.enabled (eq .Values.postgres.auth.password "") -}}
 {{- fail "postgres.auth.password is required when postgres is enabled. Set it with --set postgres.auth.password=<value>" -}}
 {{- end -}}
