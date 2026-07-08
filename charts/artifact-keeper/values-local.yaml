@@ -1,0 +1,15 @@
+secrets:
+  jwtSecret: uptempodevopsbestcompanyoptiophiuhsufhiuehush
+backend:
+  persistence: { size: 2Gi }
+  scanWorkspace: { size: 1Gi }
+opensearch:   { enabled: false }
+trivy:        { enabled: false }
+scannerAdapter: { enabled: false }
+ingress:      { enabled: false }
+networkPolicy: { enabled: false }
+dependencyTrack:
+  persistence: { size: 2Gi }
+  resources:
+    requests: { cpu: 250m, memory: 2Gi, ephemeral-storage: 256Mi }
+    limits:   { cpu: "2",  memory: 4Gi, ephemeral-storage: 1Gi }
