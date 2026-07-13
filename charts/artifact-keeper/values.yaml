@@ -137,9 +137,10 @@ backend:
     httpPort: 8080
     grpcPort: 9090
   # -- Dedicated backend database via an existing Secret (e.g. the CloudNativePG
-  # `<cluster>-app` Secret). Takes precedence over postgres.enabled and
-  # externalDatabase. Key names default to the CNPG layout and can be remapped;
-  # use `fqdn-uri`/`fqdn-*` keys when the cluster is in another namespace.
+  # `<cluster>-app` Secret). Only used when postgres.enabled=false AND
+  # externalDatabase.enabled=false. Key names default to the CNPG layout and
+  # can be remapped; use `fqdn-uri`/`fqdn-*` keys when the database cluster
+  # lives in another namespace.
   database:
     existingSecret: ""
     secretKeys:
@@ -501,8 +502,12 @@ postgres:
   nodeSelector: {}
   topologySpreadConstraints: []
 
-# -- External database (used when postgres.enabled=false)
+# -- External database (the default when postgres.enabled=false). Set
+# `enabled: false` here to switch the backend and DependencyTrack to their
+# per-service database.existingSecret references instead; leaving the key
+# out keeps the legacy behavior.
 externalDatabase:
+  # enabled: true
   host: ""
   port: 5432
   username: ""
@@ -773,8 +778,8 @@ dependencyTrack:
         - ALL
   adminPassword: ""
   # -- Dedicated DependencyTrack database via an existing Secret (e.g. the
-  # CloudNativePG `<cluster>-app` Secret). Takes precedence over the shared
-  # postgres and externalDatabase. username/password are passed separately
+  # CloudNativePG `<cluster>-app` Secret). Only used when postgres.enabled=false
+  # AND externalDatabase.enabled=false. username/password are passed separately
   # from jdbcUri because DependencyTrack expects them as distinct variables.
   database:
     existingSecret: ""
