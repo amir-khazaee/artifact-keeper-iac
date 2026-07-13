@@ -44,6 +44,11 @@
 postgres:
   enabled: false
 
+# Opt out of the legacy externalDatabase default so the per-service
+# database.existingSecret references below take effect.
+externalDatabase:
+  enabled: false
+
 backend:
   database:
     existingSecret: ak-backend-db-app
